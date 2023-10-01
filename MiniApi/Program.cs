@@ -24,6 +24,9 @@ builder.Services.AddDbContext<ApplicationDbContext>((p, b) =>
     b.UseNpgsql(databaseSetting.ConnectionString);
 });
 
+// Handle
+builder.Services.AddProductHandle();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -35,6 +38,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.AddProductEndpoint();
+// Endpoint
+app.MapProductEndpoint();
 
 app.Run();

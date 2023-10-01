@@ -5,7 +5,13 @@ namespace MiniApi.Applicatoin.Products
 {
     internal static class ProductEndpoint
     {
-        internal static IEndpointRouteBuilder AddProductEndpoint(this IEndpointRouteBuilder endpointRouteBuilder)
+        internal static IServiceCollection AddProductHandle(this IServiceCollection services)
+        {
+            return services
+                .AddScoped<ProductHandle>();
+        }
+
+        internal static IEndpointRouteBuilder MapProductEndpoint(this IEndpointRouteBuilder endpointRouteBuilder)
         {
             endpointRouteBuilder
                 .MapGet("/product/{id}", async (

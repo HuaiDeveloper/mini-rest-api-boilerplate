@@ -9,6 +9,7 @@
         public Product(string name, string? description)
         {
             Id = Guid.NewGuid();
+            Name = name;
             Description = description;
         }
 
