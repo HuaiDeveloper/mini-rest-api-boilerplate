@@ -11,6 +11,7 @@ namespace MiniApi.Application.Products
                 .MapGet("/product/{id}", async (
                     Guid id,
                     [FromServices] ProductService productService) => await productService.GetProductAsync(id))
+                .RequireAuthorization()
                 .WithName("GetProduct")
                 .WithOpenApi();
 
@@ -19,6 +20,7 @@ namespace MiniApi.Application.Products
                     [FromQuery] int page,
                     [FromQuery] int size,
                     [FromServices] ProductService productService) => await productService.SearchProductsAsync(page, size))
+                .RequireAuthorization()
                 .WithName("SearchProducts")
                 .WithOpenApi();
 
@@ -26,6 +28,7 @@ namespace MiniApi.Application.Products
                 .MapPost("/product", async (
                     [FromBody] CreateProductRequest request,
                     [FromServices] ProductService productService) => await productService.CreateProductAsync(request))
+                .RequireAuthorization()
                 .WithName("CreateProduct")
                 .WithOpenApi();
 
@@ -33,6 +36,7 @@ namespace MiniApi.Application.Products
                 .MapPut("/product", async (
                     [FromBody] UpdateProductRequest request,
                     [FromServices] ProductService productService) => await productService.UpdateProductAsync(request))
+                .RequireAuthorization()
                 .WithName("UpdateProduct")
                 .WithOpenApi();
 
@@ -40,6 +44,7 @@ namespace MiniApi.Application.Products
                 .MapDelete("/product/{id}", async (
                     Guid id,
                     [FromServices] ProductService productService) => await productService.DeleteProductAsync(id))
+                .RequireAuthorization()
                 .WithName("DeleteProduct")
                 .WithOpenApi();
 
