@@ -1,9 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using MiniApi.Application.Auth;
 using MiniApi.Application.Products;
 using MiniApi.Persistence.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
+using MiniApi.Application.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +15,30 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = ".MiniApi.Cookies";
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.HttpOnly = true;
+        options.EventsType = typeof(CustomCookieAuthenticationEvents);
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    string[] authRoles =
+    {
+        AuthRole.Admin,
+        AuthRole.User,
+        AuthRole.Guest
+    };
+    foreach (var role in authRoles)
+    {
+        options.AddPolicy(role, (policy) => policy.RequireRole(role));
+    }
+});
 
 builder.Services
     .AddOptions<DatabaseSetting>()
@@ -24,8 +52,10 @@ builder.Services.AddDbContext<ApplicationDbContext>((p, b) =>
     b.UseNpgsql(databaseSetting.ConnectionString);
 });
 
-// Handle
-builder.Services.AddProductHandle();
+// Service
+builder.Services
+    .AddScoped<CustomCookieAuthenticationEvents>()
+    .AddScoped<ProductService>();
 
 var app = builder.Build();
 
@@ -38,7 +68,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 // Endpoint
-app.MapProductEndpoint();
+app.MapProductEndpoint()
+    .MapAuthEndpoint();
 
 app.Run();
