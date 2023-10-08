@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using MiniApi.Application.Common;
+using MiniApi.Common;
 
 namespace MiniApi.Application.Auth;
 

@@ -1,4 +1,4 @@
-﻿namespace MiniApi.Application.Common;
+﻿namespace MiniApi.Common;
 
 public class AuthRole
 {
