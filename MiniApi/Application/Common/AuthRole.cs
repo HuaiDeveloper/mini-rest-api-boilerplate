@@ -5,4 +5,14 @@ public class AuthRole
     public static readonly string Admin = "Admin";
     public static readonly string User = "User";
     public static readonly string Guest = "Guest";
+
+    public static string[] GetAuthRoles()
+    {
+        return new []
+        {
+            Admin,
+            User,
+            Guest
+        };
+    }
 }

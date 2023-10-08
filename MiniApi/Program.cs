@@ -28,12 +28,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization(options =>
 {
-    string[] authRoles =
-    {
-        AuthRole.Admin,
-        AuthRole.User,
-        AuthRole.Guest
-    };
+    string[] authRoles = AuthRole.GetAuthRoles();
     foreach (var role in authRoles)
     {
         options.AddPolicy(role, (policy) => policy.RequireRole(role));
