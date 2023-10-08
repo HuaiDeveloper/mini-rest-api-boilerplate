@@ -5,94 +5,93 @@ using MiniApi.Application.Products.Response;
 using MiniApi.Model;
 using MiniApi.Persistence.EntityFrameworkCore;
 
-namespace MiniApi.Application.Products
+namespace MiniApi.Application.Products;
+
+public class ProductService
 {
-    public class ProductService
+    private readonly ApplicationDbContext _dbContext;
+    public ProductService(ApplicationDbContext dbContext)
     {
-        private readonly ApplicationDbContext _dbContext;
-        public ProductService(ApplicationDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        _dbContext = dbContext;
+    }
 
-        public async Task<ProductDetailDto> GetProductAsync(Guid id)
-        {
-            var result = await _dbContext.Products
-                .Where(x => x.Id == id)
-                .Select(x => new ProductDetailDto()
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Description = x.Description
-                })
-                .FirstOrDefaultAsync();
-            if (result == null)
-                throw new Exception($"Not found id: {id}");
-
-            return result;
-        }
-
-        public async Task<List<ProductDto>> SearchProductsAsync(int page, int size)
-        {
-            var result = await _dbContext.Products
-                .Skip((page - 1) * size)
-                .Take(size)
-                .Select(x => new ProductDto()
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                })
-                .ToListAsync();
-
-            return result;
-        }
-
-        public async Task<ProductDetailDto> CreateProductAsync(CreateProductRequest request)
-        {
-            var product = new Product(request.Name, request.Description);
-
-            _dbContext.Products.Add(product);
-            await _dbContext.SaveChangesAsync();
-
-            var result = new ProductDetailDto()
+    public async Task<ProductDetailDto> GetProductAsync(Guid id)
+    {
+        var result = await _dbContext.Products.AsNoTracking()
+            .Where(x => x.Id == id)
+            .Select(x => new ProductDetailDto()
             {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description
-            };
+                Id = x.Id,
+                Name = x.Name,
+                Description = x.Description
+            })
+            .FirstOrDefaultAsync();
+        if (result == null)
+            throw new Exception($"Not found id: {id}");
 
-            return result;
-        }
+        return result;
+    }
 
-        public async Task<ProductDetailDto> UpdateProductAsync(UpdateProductRequest request)
-        {
-            var product = await _dbContext.Products.Where(x => x.Id == request.Id).FirstOrDefaultAsync();
-            if (product == null)
-                throw new Exception($"Not found id: {request.Id}");
-
-            product.Update(request.Name, request.Description);
-            await _dbContext.SaveChangesAsync();
-
-            var result = new ProductDetailDto()
+    public async Task<List<ProductDto>> SearchProductsAsync(int page, int size)
+    {
+        var result = await _dbContext.Products.AsNoTracking()
+            .Skip((page - 1) * size)
+            .Take(size)
+            .Select(x => new ProductDto()
             {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description
-            };
+                Id = x.Id,
+                Name = x.Name,
+            })
+            .ToListAsync();
 
-            return result;
-        }
+        return result;
+    }
 
-        public async Task<string> DeleteProductAsync(Guid id)
+    public async Task<ProductDetailDto> CreateProductAsync(CreateProductRequest request)
+    {
+        var product = new Product(request.Name, request.Description);
+
+        _dbContext.Products.Add(product);
+        await _dbContext.SaveChangesAsync();
+
+        var result = new ProductDetailDto()
         {
-            var product = await _dbContext.Products.Where(x => x.Id == id).FirstOrDefaultAsync();
-            if (product == null)
-                throw new Exception($"Not found id: {id}");
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description
+        };
 
-            _dbContext.Products.Remove(product);
-            await _dbContext.SaveChangesAsync();
+        return result;
+    }
 
-            return "Successfully deleted";
-        }
+    public async Task<ProductDetailDto> UpdateProductAsync(UpdateProductRequest request)
+    {
+        var product = await _dbContext.Products.Where(x => x.Id == request.Id).FirstOrDefaultAsync();
+        if (product == null)
+            throw new Exception($"Not found id: {request.Id}");
+
+        product.Update(request.Name, request.Description);
+        await _dbContext.SaveChangesAsync();
+
+        var result = new ProductDetailDto()
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description
+        };
+
+        return result;
+    }
+
+    public async Task<string> DeleteProductAsync(Guid id)
+    {
+        var product = await _dbContext.Products.Where(x => x.Id == id).FirstOrDefaultAsync();
+        if (product == null)
+            throw new Exception($"Not found id: {id}");
+
+        _dbContext.Products.Remove(product);
+        await _dbContext.SaveChangesAsync();
+
+        return "Successfully deleted";
     }
 }

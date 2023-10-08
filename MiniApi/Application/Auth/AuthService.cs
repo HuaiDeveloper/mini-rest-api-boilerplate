@@ -1,7 +1,6 @@
-﻿namespace MiniApi.Application.Auth
+﻿namespace MiniApi.Application.Auth;
+
+public class AuthService
 {
-    public class AuthService
-    {
     
-    }
 }

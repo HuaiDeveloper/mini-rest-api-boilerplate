@@ -1,7 +1,6 @@
-﻿namespace MiniApi.Persistence.EntityFrameworkCore
+﻿namespace MiniApi.Persistence.EntityFrameworkCore;
+
+public class DatabaseSetting
 {
-    public class DatabaseSetting
-    {
-        public string ConnectionString { get; set; } = default!;
-    }
+    public string ConnectionString { get; set; } = default!;
 }

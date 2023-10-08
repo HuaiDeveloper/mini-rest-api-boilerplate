@@ -1,9 +1,8 @@
-﻿namespace MiniApi.Application.Products.Response
+﻿namespace MiniApi.Application.Products.Response;
+
+public class ProductDetailDto
 {
-    public class ProductDetailDto
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; } = default!;
-        public string? Description { get; set; }
-    }
+    public Guid Id { get; set; }
+    public string Name { get; set; } = default!;
+    public string? Description { get; set; }
 }
