@@ -9,7 +9,7 @@ internal static class ProductEndpoint
     {
         endpointRouteBuilder
             .MapGet("/product/{id}", async (
-                Guid id,
+                long id,
                 [FromServices] ProductService productService) => await productService.GetProductAsync(id))
             .RequireAuthorization()
             .WithName("GetProduct")
@@ -42,7 +42,7 @@ internal static class ProductEndpoint
 
         endpointRouteBuilder
             .MapDelete("/product/{id}", async (
-                Guid id,
+                long id,
                 [FromServices] ProductService productService) => await productService.DeleteProductAsync(id))
             .RequireAuthorization()
             .WithName("DeleteProduct")

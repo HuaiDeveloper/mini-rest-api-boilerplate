@@ -15,7 +15,7 @@ public class ProductService
         _dbContext = dbContext;
     }
 
-    public async Task<ProductDetailDto> GetProductAsync(Guid id)
+    public async Task<ProductDetailDto> GetProductAsync(long id)
     {
         var result = await _dbContext.Products.AsNoTracking()
             .Where(x => x.Id == id)
@@ -83,7 +83,7 @@ public class ProductService
         return result;
     }
 
-    public async Task<string> DeleteProductAsync(Guid id)
+    public async Task<string> DeleteProductAsync(long id)
     {
         var product = await _dbContext.Products.Where(x => x.Id == id).FirstOrDefaultAsync();
         if (product == null)

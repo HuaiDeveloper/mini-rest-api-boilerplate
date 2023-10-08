@@ -8,8 +8,28 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
+        builder.ToTable("Product");
+
+        builder.HasKey(x => x.Id);
+
         builder
-            .ToTable("Product");
+            .Property(x => x.Id)
+            .ValueGeneratedOnAdd();
+
+    }
+}
+
+public class StaffConfig : IEntityTypeConfiguration<Staff>
+{
+    public void Configure(EntityTypeBuilder<Staff> builder)
+    {
+        builder.ToTable("Staff");
+
+        builder.HasKey(x => x.Id);
+
+        builder
+            .Property(x => x.Id)
+            .ValueGeneratedOnAdd();
 
     }
 }
