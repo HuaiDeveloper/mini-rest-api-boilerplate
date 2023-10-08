@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using MiniApi.Domain;
+using MiniApi.Model;
 
 namespace MiniApi.Persistence.EntityFrameworkCore
 {

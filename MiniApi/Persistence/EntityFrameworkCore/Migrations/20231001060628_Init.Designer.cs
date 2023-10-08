@@ -25,7 +25,7 @@ namespace MiniApi.Persistence.EntityFrameworkCore.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("MiniApi.Domain.Product", b =>
+            modelBuilder.Entity("MiniApi.Model.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

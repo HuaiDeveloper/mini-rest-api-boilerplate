@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MiniApi.Application.Products.Request;
 using MiniApi.Application.Products.Response;
-using MiniApi.Domain;
+using MiniApi.Model;
 using MiniApi.Persistence.EntityFrameworkCore;
 
 namespace MiniApi.Application.Products

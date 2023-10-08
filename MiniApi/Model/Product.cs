@@ -1,4 +1,4 @@
-﻿namespace MiniApi.Domain
+﻿namespace MiniApi.Model
 {
     public class Product
     {
