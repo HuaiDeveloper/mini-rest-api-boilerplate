@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using MiniApi.Applicatoin.Products;
+using MiniApi.Application.Products;
 using MiniApi.Persistence.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;

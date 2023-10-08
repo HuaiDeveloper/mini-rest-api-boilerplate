@@ -1,6 +1,6 @@
-﻿namespace MiniApi.Applicatoin.Products.Request
+﻿namespace MiniApi.Application.Products.Response
 {
-    public class UpdateProductRequest
+    public class ProductDetailDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = default!;

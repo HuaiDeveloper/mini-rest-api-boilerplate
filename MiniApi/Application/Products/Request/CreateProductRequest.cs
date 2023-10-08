@@ -1,4 +1,4 @@
-﻿namespace MiniApi.Applicatoin.Products.Request
+﻿namespace MiniApi.Application.Products.Request
 {
     public class CreateProductRequest
     {

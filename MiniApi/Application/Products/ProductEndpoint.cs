@@ -1,25 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MiniApi.Applicatoin.Products.Request;
+using MiniApi.Application.Products.Request;
 
-namespace MiniApi.Applicatoin.Products
+namespace MiniApi.Application.Products
 {
     internal static class ProductEndpoint
     {
-        internal static IServiceCollection AddProductHandle(this IServiceCollection services)
-        {
-            return services
-                .AddScoped<ProductHandle>();
-        }
-
         internal static IEndpointRouteBuilder MapProductEndpoint(this IEndpointRouteBuilder endpointRouteBuilder)
         {
             endpointRouteBuilder
                 .MapGet("/product/{id}", async (
                     Guid id,
-                    [FromServices] ProductHandle productHandle) =>
-                {
-                    return await productHandle.GetProductAsync(id);
-                })
+                    [FromServices] ProductService productService) => await productService.GetProductAsync(id))
                 .WithName("GetProduct")
                 .WithOpenApi();
 
@@ -27,40 +18,28 @@ namespace MiniApi.Applicatoin.Products
                 .MapGet("/product", async (
                     [FromQuery] int page,
                     [FromQuery] int size,
-                    [FromServices] ProductHandle productHandle) =>
-                {
-                    return await productHandle.SearchProductsAsync(page, size);
-                })
+                    [FromServices] ProductService productService) => await productService.SearchProductsAsync(page, size))
                 .WithName("SearchProducts")
                 .WithOpenApi();
 
             endpointRouteBuilder
                 .MapPost("/product", async (
                     [FromBody] CreateProductRequest request,
-                    [FromServices] ProductHandle productHandle) =>
-                {
-                    return await productHandle.CreateProductAsync(request);
-                })
+                    [FromServices] ProductService productService) => await productService.CreateProductAsync(request))
                 .WithName("CreateProduct")
                 .WithOpenApi();
 
             endpointRouteBuilder
                 .MapPut("/product", async (
                     [FromBody] UpdateProductRequest request,
-                    [FromServices] ProductHandle productHandle) =>
-                {
-                    return await productHandle.UpdateProductAsync(request);
-                })
+                    [FromServices] ProductService productService) => await productService.UpdateProductAsync(request))
                 .WithName("UpdateProduct")
                 .WithOpenApi();
 
             endpointRouteBuilder
                 .MapDelete("/product/{id}", async (
                     Guid id,
-                    [FromServices] ProductHandle productHandle) =>
-                {
-                    return await productHandle.DeleteProductAsync(id);
-                })
+                    [FromServices] ProductService productService) => await productService.DeleteProductAsync(id))
                 .WithName("DeleteProduct")
                 .WithOpenApi();
 

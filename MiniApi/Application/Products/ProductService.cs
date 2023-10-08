@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MiniApi.Applicatoin.Products.Request;
-using MiniApi.Applicatoin.Products.Response;
+using MiniApi.Application.Products.Request;
+using MiniApi.Application.Products.Response;
 using MiniApi.Domain;
 using MiniApi.Persistence.EntityFrameworkCore;
 
-namespace MiniApi.Applicatoin.Products
+namespace MiniApi.Application.Products
 {
-    public class ProductHandle
+    public class ProductService
     {
         private readonly ApplicationDbContext _dbContext;
-        public ProductHandle(ApplicationDbContext dbContext)
+        public ProductService(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }

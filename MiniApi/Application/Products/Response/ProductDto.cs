@@ -1,4 +1,4 @@
-﻿namespace MiniApi.Applicatoin.Products.Response
+﻿namespace MiniApi.Application.Products.Response
 {
     public class ProductDto
     {
