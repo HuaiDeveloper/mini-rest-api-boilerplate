@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MiniApi.Common;
+using MiniApi.Common.Exceptions;
 using MiniApi.Model;
 using MiniApi.Persistence.EntityFrameworkCore;
 
@@ -21,13 +22,13 @@ public class StaffManager
         string? description)
     {
         if (string.IsNullOrEmpty(name))
-            throw new Exception("Name required");
+            throw new BadRequestException("Name required");
         
         if (string.IsNullOrEmpty(email))
-            throw new Exception("Email required");
+            throw new BadRequestException("Email required");
         
         if (string.IsNullOrEmpty(password))
-            throw new Exception("Password required");
+            throw new BadRequestException("Password required");
         
         var staff = new Staff(
             name,
@@ -52,10 +53,10 @@ public class StaffManager
             .FirstOrDefaultAsync();
 
         if (staff == null)
-            throw new Exception("Staff not found!");
+            throw new NotFoundException("Staff not found!");
         
         if (VerifyAuthRole(staff.AuthRole) == false)
-            throw new Exception("Role not found!");
+            throw new NotFoundException("Role not found!");
 
         return staff;
     }
@@ -67,10 +68,10 @@ public class StaffManager
             .FirstOrDefaultAsync();
 
         if (staff == null)
-            throw new Exception("Staff not found!");
+            throw new NotFoundException("Staff not found!");
 
         if (VerifyAuthRole(staff.AuthRole) == false)
-            throw new Exception("Role not found!");
+            throw new NotFoundException("Role not found!");
 
         return staff;
     }
