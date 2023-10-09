@@ -6,10 +6,10 @@ using MiniApi.Persistence.EntityFrameworkCore;
 
 namespace MiniApi.Application.Auth;
 
-public class StaffService
+public class StaffManager
 {
     private readonly ApplicationDbContext _dbContext;
-    public StaffService(ApplicationDbContext dbContext)
+    public StaffManager(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
     }

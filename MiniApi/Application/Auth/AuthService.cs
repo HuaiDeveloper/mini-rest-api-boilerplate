@@ -8,13 +8,13 @@ namespace MiniApi.Application.Auth;
 public class AuthService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly StaffService _staffService;
+    private readonly StaffManager _staffManager;
     public AuthService(
         IHttpContextAccessor httpContextAccessor,
-        StaffService staffService)
+        StaffManager staffManager)
     {
         _httpContextAccessor = httpContextAccessor;
-        _staffService = staffService;
+        _staffManager = staffManager;
     }
 
     public async Task<string> SignUp(SignUpRequest request)
@@ -30,11 +30,11 @@ public class AuthService
             if (string.IsNullOrEmpty(request.Password))
                 throw new Exception("Password required");
 
-            var isExistStaff = await _staffService.IsExistStaffNameAsync(request.Name);
+            var isExistStaff = await _staffManager.IsExistStaffNameAsync(request.Name);
             if (isExistStaff)
                 throw new Exception("User name exist!");
                     
-            await _staffService.CreateUserStaffAsync(
+            await _staffManager.CreateUserStaffAsync(
                 request.Name,
                 request.Email,
                 request.Password,
@@ -59,8 +59,8 @@ public class AuthService
             if (string.IsNullOrEmpty(request.Password))
                 throw new Exception("password required");
 
-            var staff = await _staffService.FindStaffByNameAsync(request.Name);
-            var verifyPasswordResult = await _staffService.VerifyPasswordAsync(staff, request.Password);
+            var staff = await _staffManager.FindStaffByNameAsync(request.Name);
+            var verifyPasswordResult = await _staffManager.VerifyPasswordAsync(staff, request.Password);
             if (verifyPasswordResult == false)
                 throw new Exception("Verification failed");
             
