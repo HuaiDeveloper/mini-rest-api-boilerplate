@@ -19,52 +19,85 @@ public class AuthService
         _staffManager = staffManager;
     }
 
-    public async Task<string> SignUp(SignUpRequest request)
+    public async Task<BaseResponse<string>> SignUp(SignUpRequest request)
     {
         try
         {
+            var errorMessages = new List<string>();
+            
             if (string.IsNullOrEmpty(request.Name))
-                throw new Exception("Name required");
+                errorMessages.Add("Name required");
         
             if (string.IsNullOrEmpty(request.Email))
-                throw new Exception("Email required");
+                errorMessages.Add("Email required");
         
             if (string.IsNullOrEmpty(request.Password))
-                throw new Exception("Password required");
+                errorMessages.Add("Password required");
+
+            if (errorMessages.Count > 0)
+                return new BaseResponse<string>()
+                {
+                    IsSuccess = false,
+                    Message = string.Join(", ", errorMessages)
+                };
 
             var isExistStaff = await _staffManager.IsExistStaffNameAsync(request.Name);
             if (isExistStaff)
-                throw new Exception("User name exist!");
+                return new BaseResponse<string>()
+                {
+                    IsSuccess = false,
+                    Message = "User name exist!"
+                };
                     
             await _staffManager.CreateUserStaffAsync(
                 request.Name,
                 request.Email,
                 request.Password,
                 request.Description);
-                    
-            return "Success";
+            
+            return new BaseResponse<string>()
+            {
+                IsSuccess = true,
+                Data = "Success"
+            };
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
-            return "Fail";
+            return new BaseResponse<string>()
+            {
+                IsSuccess = false,
+                Message = "Error"
+            };
         }
     }
     
-    public async Task<string> SignIn(SignInRequest request)
+    public async Task<BaseResponse<string>> SignIn(SignInRequest request)
     {
         try
         {
+            var errorMessages = new List<string>();
+            
             if (string.IsNullOrEmpty(request.Name))
-                throw new Exception("Staff name required");
+                errorMessages.Add("Staff name required");
             
             if (string.IsNullOrEmpty(request.Password))
-                throw new Exception("password required");
+                errorMessages.Add("password required");
+            
+            if (errorMessages.Count > 0)
+                return new BaseResponse<string>()
+                {
+                    IsSuccess = false,
+                    Message = string.Join(", ", errorMessages)
+                };
 
             var staff = await _staffManager.FindStaffByNameAsync(request.Name);
             var verifyPasswordResult = await _staffManager.VerifyPasswordAsync(staff, request.Password);
             if (verifyPasswordResult == false)
-                throw new Exception("Verification failed");
+                return new BaseResponse<string>()
+                {
+                    IsSuccess = false,
+                    Message = "Verification failed"
+                };
             
             var claims = new List<Claim>
             {
@@ -88,37 +121,59 @@ public class AuthService
 
             var httpContext = _httpContextAccessor.HttpContext;
             if (httpContext == null)
-                throw new Exception("httpContext is null");
+                return new BaseResponse<string>()
+                {
+                    IsSuccess = false,
+                    Message = "httpContext is null"
+                };
             
             await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
                     
-            return "Success";
+            return new BaseResponse<string>()
+            {
+                IsSuccess = true,
+                Data = "Success"
+            };
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
-            return "Fail";
+            return new BaseResponse<string>()
+            {
+                IsSuccess = false,
+                Message = "Error"
+            };
         }
     }
 
-    public async Task<string> SignOut()
+    public async Task<BaseResponse<string>> SignOut()
     {
         try
         {
             var httpContext = _httpContextAccessor.HttpContext;
             if (httpContext == null)
-                throw new Exception("httpContext is null");
+                return new BaseResponse<string>()
+                {
+                    IsSuccess = false,
+                    Message = "httpContext is null"
+                };
             
             await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                     
-            return "Success";
+            return new BaseResponse<string>()
+            {
+                IsSuccess = true,
+                Data = "Success"
+            };
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
-            return "Fail";
+            return new BaseResponse<string>()
+            {
+                IsSuccess = false,
+                Message = "Error"
+            };
         }
     }
     
@@ -150,8 +205,7 @@ public class AuthService
             return new BasePaginationResponse<List<StaffDto>>()
             {
                 IsSuccess = false,
-                Data = null,
-                TotalCount = 0
+                Message = "Error"
             };
         }
     }
