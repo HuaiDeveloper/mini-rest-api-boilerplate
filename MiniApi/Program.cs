@@ -50,6 +50,7 @@ builder.Services.AddDbContext<ApplicationDbContext>((p, b) =>
 // Service
 builder.Services
     .AddScoped<CustomCookieAuthenticationEvents>()
+    .AddScoped<StaffManager>()
     .AddScoped<ProductService>();
 
 var app = builder.Build();

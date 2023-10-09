@@ -1,6 +1,6 @@
 ﻿namespace MiniApi.Common;
 
-public class AuthRole
+public static class AuthRole
 {
     public static readonly string Admin = "Admin";
     public static readonly string User = "User";

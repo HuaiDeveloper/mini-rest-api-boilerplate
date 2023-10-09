@@ -1,0 +1,121 @@
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using MiniApi.Common;
+using MiniApi.Model;
+using MiniApi.Persistence.EntityFrameworkCore;
+
+namespace MiniApi.Application.Auth;
+
+public class StaffManager
+{
+    private readonly ApplicationDbContext _dbContext;
+    public StaffManager(ApplicationDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task<Staff> CreateUserStaffAsync(
+        string name,
+        string email,
+        string password,
+        string? description)
+    {
+        if (string.IsNullOrEmpty(name))
+            throw new Exception("Name required");
+        
+        if (string.IsNullOrEmpty(email))
+            throw new Exception("Email required");
+        
+        if (string.IsNullOrEmpty(password))
+            throw new Exception("Password required");
+        
+        var staff = new Staff(
+            name,
+            email,
+            "not hash",
+            description,
+            AuthRole.User);
+
+        staff.UpdatePassword(HashPassword(staff, password));
+        
+        _dbContext.Staffs.Add(staff);
+
+        await _dbContext.SaveChangesAsync();
+
+        return staff;
+    }
+    
+    public async Task<Staff> FindStaffByIdAsync(long id)
+    {
+        var staff = await _dbContext.Staffs.AsNoTracking()
+            .Where(x => x.Id == id)
+            .FirstOrDefaultAsync();
+
+        if (staff == null)
+            throw new Exception("Staff not found!");
+        
+        if (VerifyAuthRole(staff.AuthRole) == false)
+            throw new Exception("Role not found!");
+
+        return staff;
+    }
+    
+    public async Task<bool> IsExistStaffNameAsync(string name)
+    {
+        return await _dbContext.Staffs.AnyAsync(x => x.Name == name);
+    }
+    
+    public async Task<Staff> FindStaffByNameAsync(string name)
+    {
+        var staff = await _dbContext.Staffs.AsNoTracking()
+            .Where(x => x.Name == name)
+            .FirstOrDefaultAsync();
+
+        if (staff == null)
+            throw new Exception("Staff not found!");
+
+        if (VerifyAuthRole(staff.AuthRole) == false)
+            throw new Exception("Role not found!");
+
+        return staff;
+    }
+    
+    public async Task<bool> VerifyPasswordAsync(Staff staff, string password)
+    {
+        var staffPasswordHasher = new PasswordHasher<MiniApi.Model.Staff>();
+        
+        var verifyHashedPasswordResult = staffPasswordHasher.VerifyHashedPassword(
+            staff, staff.Password, password);
+
+        if (verifyHashedPasswordResult == PasswordVerificationResult.Failed)
+            return false;
+
+        if (verifyHashedPasswordResult == PasswordVerificationResult.SuccessRehashNeeded)
+        {
+            var staffContext = await _dbContext.Staffs
+                .Where(x => x.Id == staff.Id)
+                .FirstOrDefaultAsync();
+
+            if (staffContext == null)
+                return false;
+
+            staffContext.UpdatePassword(staffPasswordHasher.HashPassword(staffContext, password));
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        return true;
+    }
+
+    private string HashPassword(Staff staff, string password)
+    {
+        var staffPasswordHasher = new PasswordHasher<MiniApi.Model.Staff>();
+
+        return staffPasswordHasher.HashPassword(staff, password);
+    }
+
+    private bool VerifyAuthRole(string staffAuthRole)
+    {
+        return AuthRole.GetAuthRoles().Any(x => x == staffAuthRole);
+    }
+}
