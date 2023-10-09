@@ -45,7 +45,7 @@ public class StaffManager
         return staff;
     }
     
-    public async Task<Staff> FindStaffByIdAsync(long id)
+    public async Task<Staff> FindStaffAsync(long id)
     {
         var staff = await _dbContext.Staffs.AsNoTracking()
             .Where(x => x.Id == id)
@@ -60,12 +60,7 @@ public class StaffManager
         return staff;
     }
     
-    public async Task<bool> IsExistStaffNameAsync(string name)
-    {
-        return await _dbContext.Staffs.AnyAsync(x => x.Name == name);
-    }
-    
-    public async Task<Staff> FindStaffByNameAsync(string name)
+    public async Task<Staff> FindStaffAsync(string name)
     {
         var staff = await _dbContext.Staffs.AsNoTracking()
             .Where(x => x.Name == name)
@@ -78,6 +73,11 @@ public class StaffManager
             throw new Exception("Role not found!");
 
         return staff;
+    }
+    
+    public async Task<bool> IsExistStaffNameAsync(string name)
+    {
+        return await _dbContext.Staffs.AnyAsync(x => x.Name == name);
     }
     
     public async Task<bool> VerifyPasswordAsync(Staff staff, string password)

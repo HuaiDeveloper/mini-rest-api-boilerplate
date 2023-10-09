@@ -90,7 +90,7 @@ public class AuthService
                     Message = string.Join(", ", errorMessages)
                 };
 
-            var staff = await _staffManager.FindStaffByNameAsync(request.Name);
+            var staff = await _staffManager.FindStaffAsync(request.Name);
             var verifyPasswordResult = await _staffManager.VerifyPasswordAsync(staff, request.Password);
             if (verifyPasswordResult == false)
                 return new BaseResponse<string>()
