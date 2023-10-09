@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MiniApi.Application.Products.Request;
+using MiniApi.Common;
 
 namespace MiniApi.Application.Products;
 
@@ -17,9 +18,8 @@ internal static class ProductEndpoint
 
         endpointRouteBuilder
             .MapGet("/product", async (
-                [FromQuery] int page,
-                [FromQuery] int size,
-                [FromServices] ProductService productService) => await productService.SearchProductsAsync(page, size))
+                [AsParameters] BasePaginationRequest queryString,
+                [FromServices] ProductService productService) => await productService.SearchProductsAsync(queryString))
             .RequireAuthorization()
             .WithName("SearchProducts")
             .WithOpenApi();
