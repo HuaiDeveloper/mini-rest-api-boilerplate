@@ -106,6 +106,21 @@ public class StaffManager
 
         return true;
     }
+    
+    public async Task<(List<Staff> Data, int TotalCount)> SearchUserStaffs(int page, int size)
+    {
+        var staffQuery = _dbContext.Staffs.AsNoTracking()
+            .Where(x => x.AuthRole == AuthRole.User);
+
+        var staffs = await staffQuery
+            .Skip((page - 1) * size)
+            .Take(size)
+            .ToListAsync();
+
+        var totalCount = await staffQuery.CountAsync();
+
+        return (staffs, totalCount);
+    }
 
     private string HashPassword(Staff staff, string password)
     {

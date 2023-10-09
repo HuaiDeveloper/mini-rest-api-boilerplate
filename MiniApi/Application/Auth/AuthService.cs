@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using MiniApi.Application.Auth.Request;
+using MiniApi.Application.Auth.Response;
+using MiniApi.Common;
 
 namespace MiniApi.Application.Auth;
 
@@ -117,6 +119,40 @@ public class AuthService
         {
             Console.WriteLine(ex);
             return "Fail";
+        }
+    }
+    
+    public async Task<BasePaginationResponse<List<StaffDto>>> SearchUserStaffs(BasePaginationRequest request)
+    {
+        try
+        {
+            var searchUserStaffsResult = await _staffManager.SearchUserStaffs(
+                request.Page, request.Size);
+
+            var data = searchUserStaffsResult.Data
+                .Select(x => new StaffDto()
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Email = x.Email
+                })
+                .ToList();
+
+            return new BasePaginationResponse<List<StaffDto>>()
+            {
+                IsSuccess = true,
+                Data = data,
+                TotalCount = searchUserStaffsResult.TotalCount
+            };
+        }
+        catch (Exception ex)
+        {
+            return new BasePaginationResponse<List<StaffDto>>()
+            {
+                IsSuccess = false,
+                Data = null,
+                TotalCount = 0
+            };
         }
     }
 }

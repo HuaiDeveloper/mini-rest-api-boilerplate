@@ -1,8 +1,6 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using MiniApi.Application.Auth.Request;
+using MiniApi.Common;
 
 namespace MiniApi.Application.Auth;
 
@@ -30,6 +28,14 @@ internal static class AuthEndpoint
                 HttpContext httpContext,
                 [FromServices] AuthService authService) => await authService.SignOut())
             .WithName("SignOut")
+            .WithOpenApi();
+        
+        endpointRouteBuilder
+            .MapGet("/staff", async (
+                [AsParameters] BasePaginationRequest queryString,
+                [FromServices] AuthService authService) => await authService.SearchUserStaffs(queryString))
+            .WithName("SearchStaff")
+            .RequireAuthorization(AuthRole.User)
             .WithOpenApi();
 
         return endpointRouteBuilder;
