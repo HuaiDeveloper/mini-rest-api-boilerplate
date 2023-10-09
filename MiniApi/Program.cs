@@ -1,14 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using MiniApi.Application.Auth;
-using MiniApi.Application.Products;
-using MiniApi.Persistence.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
-using MiniApi.Common;
+using MiniApi.Application;
 using MiniApi.Middleware;
+using MiniApi.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,45 +13,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddScoped<ExceptionMiddleware>();
-
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Cookie.Name = ".MiniApi.Cookies";
-        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-        options.Cookie.SameSite = SameSiteMode.Lax;
-        options.Cookie.HttpOnly = true;
-        options.EventsType = typeof(CustomCookieAuthenticationEvents);
-    });
-
-builder.Services.AddAuthorization(options =>
-{
-    string[] authRoles = AuthRole.GetAuthRoles();
-    foreach (var role in authRoles)
-    {
-        options.AddPolicy(role, (policy) => policy.RequireRole(role));
-    }
-});
-
-builder.Services
-    .AddOptions<DatabaseSetting>()
-    .BindConfiguration(nameof(DatabaseSetting))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
-builder.Services.AddDbContext<ApplicationDbContext>((p, b) =>
-{
-    DatabaseSetting databaseSetting = p.GetRequiredService<IOptions<DatabaseSetting>>().Value;
-    b.UseNpgsql(databaseSetting.ConnectionString);
-});
-
-// Service
-builder.Services
-    .AddScoped<CustomCookieAuthenticationEvents>()
-    .AddScoped<AuthService>()
-    .AddScoped<StaffManager>()
-    .AddScoped<ProductService>();
+builder.Services.AddPersistence();
+builder.Services.AddMiddleware();
+builder.Services.AddApplication();
 
 var app = builder.Build();
 
@@ -70,13 +28,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.UseMiddleware<ExceptionMiddleware>();
+app.UseApplication();
+app.UseCustomMiddleware();
 
 // Endpoint
-app.MapProductEndpoint()
-    .MapAuthEndpoint();
+app.MapEndpoint();
 
 app.Run();
