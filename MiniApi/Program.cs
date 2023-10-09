@@ -16,6 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -50,6 +52,7 @@ builder.Services.AddDbContext<ApplicationDbContext>((p, b) =>
 // Service
 builder.Services
     .AddScoped<CustomCookieAuthenticationEvents>()
+    .AddScoped<AuthService>()
     .AddScoped<StaffManager>()
     .AddScoped<ProductService>();
 
