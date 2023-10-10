@@ -64,6 +64,7 @@ public class ProductService
         var productQuery = _dbContext.Products.AsNoTracking();
             
         var products = await productQuery
+            .OrderByDescending(x => x.Id)
             .Skip((request.Page - 1) * request.Size)
             .Take(request.Size)
             .Select(x => new ProductDto()

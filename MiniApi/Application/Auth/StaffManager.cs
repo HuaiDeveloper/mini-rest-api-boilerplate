@@ -114,6 +114,7 @@ public class StaffManager
             .Where(x => x.AuthRole == AuthRole.User);
 
         var staffs = await staffQuery
+            .OrderByDescending(x => x.Id)
             .Skip((page - 1) * size)
             .Take(size)
             .ToListAsync();
