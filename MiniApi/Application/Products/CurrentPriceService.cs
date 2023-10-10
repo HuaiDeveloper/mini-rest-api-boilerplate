@@ -85,22 +85,36 @@ public class CurrentPriceService
             throw new BadRequestException(validationResults);
 
         var sql =
-            " SELECT" + 
-            " p.\"Id\" AS \"ProductId\"," +
-            " p.\"Name\" AS \"ProductName\"," +
-            " cp.\"Price\" AS \"LatestPrice\"," +
-            " cp.\"CurrentDate\" AS \"CurrentDate\"" +
-            " FROM public.\"Product\" p" +
-            " LEFT JOIN (" + 
-                " SELECT \"Id\", \"ProductId\", \"Price\", \"CurrentDate\"" +
-                " FROM public.\"CurrentPrice\"" +
-                " ORDER BY \"Id\" DESC" +
-                " LIMIT 1" +
-            " ) cp ON p.\"Id\" = cp.\"ProductId\"" +
-            " ORDER BY p.\"Id\" DESC" +
-            " OFFSET @skip" +
-            " LIMIT @take" +
-            ";";
+            " WITH product_temp AS" +
+            " (" +
+            "   SELECT " +
+            "       \"Id\", \"Name\"" +
+            "   FROM public.\"Product\"" +
+            "   ORDER BY \"Id\" DESC" +
+            "   OFFSET @skip" +
+            "   LIMIT @take" +
+            " )," +
+            " current_price_temp AS" +
+            " (" +
+            "   SELECT" +
+            "       x.\"ProductId\"," +
+            "       x.\"ProductName\"," +
+            "       y.\"Price\" AS \"LatestPrice\"," +
+            "       y.\"CurrentDate\"" +
+            "   FROM" +
+            "   (" +
+            "       SELECT" +
+            "           Max(cp.\"Id\") AS \"Id\"," +
+            "           pt.\"Id\" AS \"ProductId\"," +
+            "           pt.\"Name\" AS \"ProductName\"" +
+            "       FROM product_temp pt" +
+            "       LEFT JOIN public.\"CurrentPrice\" cp ON pt.\"Id\" = cp.\"ProductId\"" +
+            "       GROUP BY cp.\"ProductId\", pt.\"Id\", pt.\"Name\"" +
+            "   ) x" +
+            "   LEFT JOIN public.\"CurrentPrice\" y ON x.\"Id\" = y.\"Id\"" +
+            " )" +
+            " SELECT * FROM current_price_temp" +
+            " ORDER BY \"ProductId\" DESC;";
         
         var parameter = new DynamicParameters();
         parameter.Add("skip", (request.Page - 1) * request.Size, DbType.Int32);
