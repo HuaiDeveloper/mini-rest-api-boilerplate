@@ -20,7 +20,7 @@
 - [x] ExceptionMiddleware 集中例外處理
 - [x] 透過 Npgsql Entity Framework Core 操作資料庫
 - [x] 透過 Serilog 收集 Log
-- [ ] 透過 Dapper 操作資料庫
+- [x] 透過 Dapper 操作資料庫
 - [ ] PostgreSQL BulkUpsert 範例
 - [ ] BackgroundService 背景工作範例
 - [ ] MongoDB
