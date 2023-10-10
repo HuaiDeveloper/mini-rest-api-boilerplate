@@ -25,3 +25,15 @@
 - [ ] BackgroundService 背景工作範例
 - [ ] MongoDB
 - [ ] Unit Test
+
+## Memo
+
+### Database Migrations
+```
+cd ./MiniApi/
+dotnet ef migrations add Init --context ApplicationDbContext -o ./Persistence/EntityFrameworkCore/Migrations/
+```
+
+### Output SQL script
+dotnet ef migrations script --output "script.sql"
+
