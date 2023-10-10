@@ -21,21 +21,22 @@ public class ExceptionMiddleware : IMiddleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             
+            var errorResponse = new ErrorResponse()
+            {
+                Message = ex.Message
+            };
+            
             switch (ex)
             {
                 case BaseException baseException:
                     context.Response.StatusCode = (int)baseException.StatusCode;
+                    errorResponse.ErrorMessages = baseException.ErrorMessages;
                     break;
 
                 default:
                     context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                     break;
             }
-
-            var errorResponse = new ErrorResponse()
-            {
-                Message = ex.Message
-            };
             
             await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
         }

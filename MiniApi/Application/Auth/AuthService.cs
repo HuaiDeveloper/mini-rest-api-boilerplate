@@ -22,14 +22,9 @@ public class AuthService
 
     public async Task<string> SignUp(SignUpRequest request)
     {
-        if (string.IsNullOrEmpty(request.Name))
-            throw new BadRequestException("Name required");
-        
-        if (string.IsNullOrEmpty(request.Email))
-            throw new BadRequestException("Email required");
-        
-        if (string.IsNullOrEmpty(request.Password))
-            throw new BadRequestException("Password required");
+        var isValidate = CustomValidator.TryValidateObject(request, out var validationResults);
+        if (isValidate == false)
+            throw new BadRequestException(validationResults);
 
         var isExistStaff = await _staffManager.IsExistStaffNameAsync(request.Name);
         if (isExistStaff)
@@ -46,11 +41,9 @@ public class AuthService
     
     public async Task<string> SignIn(SignInRequest request)
     {
-        if (string.IsNullOrEmpty(request.Name))
-            throw new BadRequestException("Staff name required");
-            
-        if (string.IsNullOrEmpty(request.Password))
-            throw new BadRequestException("password required");
+        var isValidate = CustomValidator.TryValidateObject(request, out var validationResults);
+        if (isValidate == false)
+            throw new BadRequestException(validationResults);
 
         var staff = await _staffManager.FindStaffAsync(request.Name);
         var verifyPasswordResult = await _staffManager.VerifyPasswordAsync(staff, request.Password);
@@ -102,6 +95,10 @@ public class AuthService
     
     public async Task<BasePaginationResponse<List<StaffDto>>> SearchUserStaffs(BasePaginationRequest request)
     {
+        var isValidate = CustomValidator.TryValidateObject(request, out var validationResults);
+        if (isValidate == false)
+            throw new BadRequestException(validationResults);
+        
         var searchUserStaffsResult = await _staffManager.SearchUserStaffs(
             request.Page, request.Size);
 

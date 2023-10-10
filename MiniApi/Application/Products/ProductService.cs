@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiniApi.Application.Products.Request;
 using MiniApi.Application.Products.Response;
@@ -37,6 +38,10 @@ public class ProductService
 
     public async Task<BasePaginationResponse<List<ProductDto>>> SearchProductsAsync(BasePaginationRequest request)
     {
+        var isValidate = CustomValidator.TryValidateObject(request, out var validationResults);
+        if (isValidate == false)
+            throw new BadRequestException(validationResults);
+        
         var productQuery = _dbContext.Products.AsNoTracking();
             
         var products = await productQuery
@@ -60,6 +65,10 @@ public class ProductService
 
     public async Task<ProductDetailDto> CreateProductAsync(CreateProductRequest request)
     {
+        var isValidate = CustomValidator.TryValidateObject(request, out var validationResults);
+        if (isValidate == false)
+            throw new BadRequestException(validationResults);
+
         var product = new Product(request.Name, request.Description);
 
         _dbContext.Products.Add(product);
@@ -75,6 +84,10 @@ public class ProductService
 
     public async Task<ProductDetailDto> UpdateProductAsync(UpdateProductRequest request)
     {
+        var isValidate = CustomValidator.TryValidateObject(request, out var validationResults);
+        if (isValidate == false)
+            throw new BadRequestException(validationResults);
+        
         var product = await _dbContext.Products.Where(x => x.Id == request.Id).FirstOrDefaultAsync();
         if (product == null)
             throw new NotFoundException($"Not found id: {request.Id}");
