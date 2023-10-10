@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Data;
+using Microsoft.EntityFrameworkCore;
 using MiniApi.Model;
 
 namespace MiniApi.Persistence.EntityFrameworkCore;
@@ -16,6 +17,8 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
     }
+
+    public IDbConnection DbConnection => Database.GetDbConnection();
 
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Staff> Staffs => Set<Staff>();
