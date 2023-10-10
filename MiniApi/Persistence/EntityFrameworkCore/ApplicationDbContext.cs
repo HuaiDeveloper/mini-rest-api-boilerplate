@@ -19,4 +19,5 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Staff> Staffs => Set<Staff>();
+    public DbSet<CurrentPrice> CurrentPrices => Set<CurrentPrice>();
 }

@@ -10,8 +10,9 @@ internal static class Startup
     internal static IEndpointRouteBuilder MapEndpoint(this IEndpointRouteBuilder endpointRouteBuilder)
     {
         endpointRouteBuilder
+            .MapAuthEndpoint()
             .MapProductEndpoint()
-            .MapAuthEndpoint();
+            .MapCurrentPriceEndpoint();
         
         return endpointRouteBuilder;
     }
@@ -40,7 +41,8 @@ internal static class Startup
             .AddScoped<CustomCookieAuthenticationEvents>()
             .AddScoped<AuthService>()
             .AddScoped<StaffManager>()
-            .AddScoped<ProductService>();
+            .AddScoped<ProductService>()
+            .AddScoped<CurrentPriceService>();
         
         return services;
     }

@@ -20,18 +20,37 @@ public class ProductService
 
     public async Task<ProductDetailDto> GetProductAsync(long id)
     {
-        var result = await _dbContext.Products.AsNoTracking()
+        var product = await _dbContext.Products.AsNoTracking()
+            .Include(x => x.CurrentPrices)
             .Where(x => x.Id == id)
-            .Select(x => new ProductDetailDto()
+            .Select(x => new
             {
-                Id = x.Id,
-                Name = x.Name,
-                Description = x.Description
+                x.Id,
+                x.Name,
+                x.Description,
+                x.CurrentPrices
             })
             .FirstOrDefaultAsync();
 
-        if (result == null)
+        if (product == null)
             throw new NotFoundException($"Not found id: {id}");
+
+        var result = new ProductDetailDto()
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description,
+            CurrentPrices = product.CurrentPrices?
+                .Select(c => new CurrentPriceDetailDto()
+                {
+                    Id = c.Id,
+                    ProductId = c.ProductId,
+                    Price = c.Price,
+                    CurrentDate = c.CurrentDate,
+                    Description = c.Description
+                })
+                .ToList()
+        };
 
         return result;
     }
@@ -88,7 +107,10 @@ public class ProductService
         if (isValidate == false)
             throw new BadRequestException(validationResults);
         
-        var product = await _dbContext.Products.Where(x => x.Id == request.Id).FirstOrDefaultAsync();
+        var product = await _dbContext.Products
+            .Include(x => x.CurrentPrices)
+            .Where(x => x.Id == request.Id)
+            .FirstOrDefaultAsync();
         if (product == null)
             throw new NotFoundException($"Not found id: {request.Id}");
 
@@ -99,13 +121,26 @@ public class ProductService
         {
             Id = product.Id,
             Name = product.Name,
-            Description = product.Description
+            Description = product.Description,
+            CurrentPrices = product.CurrentPrices?
+                .Select(c => new CurrentPriceDetailDto()
+                {
+                    Id = c.Id,
+                    ProductId = c.ProductId,
+                    Price = c.Price,
+                    CurrentDate = c.CurrentDate,
+                    Description = c.Description
+                })
+                .ToList()
         };
     }
 
     public async Task<string> DeleteProductAsync(long id)
     {
-        var product = await _dbContext.Products.Where(x => x.Id == id).FirstOrDefaultAsync();
+        var product = await _dbContext.Products
+            .Include(x => x.CurrentPrices)
+            .Where(x => x.Id == id)
+            .FirstOrDefaultAsync();
         if (product == null)
             throw new NotFoundException($"Not found id: {id}");
 

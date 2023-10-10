@@ -15,7 +15,6 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
         builder
             .Property(x => x.Id)
             .ValueGeneratedOnAdd();
-
     }
 }
 
@@ -30,6 +29,26 @@ public class StaffConfig : IEntityTypeConfiguration<Staff>
         builder
             .Property(x => x.Id)
             .ValueGeneratedOnAdd();
+
+    }
+}
+
+public class CurrentPriceConfig : IEntityTypeConfiguration<CurrentPrice>
+{
+    public void Configure(EntityTypeBuilder<CurrentPrice> builder)
+    {
+        builder.ToTable("CurrentPrice");
+
+        builder.HasKey(x => x.Id);
+
+        builder
+            .Property(x => x.Id)
+            .ValueGeneratedOnAdd();
+
+        builder.HasOne(c => c.Product)
+            .WithMany(p => p.CurrentPrices)
+            .HasForeignKey(c => c.ProductId)
+            .OnDelete(DeleteBehavior.ClientCascade);
 
     }
 }
