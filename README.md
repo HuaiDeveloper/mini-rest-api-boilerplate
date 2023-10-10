@@ -35,5 +35,8 @@ dotnet ef migrations add Init --context ApplicationDbContext -o ./Persistence/En
 ```
 
 ### Output SQL script
+```
+cd ./MiniApi/
 dotnet ef migrations script --output "script.sql"
+```
 
