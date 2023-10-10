@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Data;
+using Dapper;
+using Microsoft.EntityFrameworkCore;
 using MiniApi.Application.Products.Request;
 using MiniApi.Application.Products.Response;
 using MiniApi.Common;
@@ -72,6 +74,48 @@ public class CurrentPriceService
             Price = currentPrice.Price,
             CurrentDate = currentPrice.CurrentDate,
             Description = currentPrice.Description
+        };
+    }
+
+    public async Task<BasePaginationResponse<List<ProductLatestPriceDto>>> SearchProductLatestPricesAsync(
+        BasePaginationRequest request)
+    {
+        var isValidate = CustomValidator.TryValidateObject(request, out var validationResults);
+        if (isValidate == false)
+            throw new BadRequestException(validationResults);
+
+        var sql =
+            " SELECT" + 
+            " p.\"Id\" AS \"ProductId\"," +
+            " p.\"Name\" AS \"ProductName\"," +
+            " cp.\"Price\" AS \"LatestPrice\"," +
+            " cp.\"CurrentDate\" AS \"CurrentDate\"" +
+            " FROM public.\"Product\" p" +
+            " LEFT JOIN (" + 
+                " SELECT \"Id\", \"ProductId\", \"Price\", \"CurrentDate\"" +
+                " FROM public.\"CurrentPrice\"" +
+                " ORDER BY \"Id\" DESC" +
+                " LIMIT 1" +
+            " ) cp ON p.\"Id\" = cp.\"ProductId\"" +
+            " ORDER BY p.\"Id\" DESC" +
+            " OFFSET @skip" +
+            " LIMIT @take" +
+            ";";
+        
+        var parameter = new DynamicParameters();
+        parameter.Add("skip", (request.Page - 1) * request.Size, DbType.Int32);
+        parameter.Add("take", request.Size, DbType.Int32);
+
+        var productLatestPrices = await _dbContext.DbConnection
+            .QueryAsync<ProductLatestPriceDto>(sql, parameter);
+
+        var countSql = "SELECT COUNT(1) FROM public.\"Product\" WHERE 1 = 1;";
+        var totalCount = await _dbContext.DbConnection.QueryFirstAsync<int>(countSql);
+
+        return new BasePaginationResponse<List<ProductLatestPriceDto>>()
+        {
+            Data = productLatestPrices.ToList(),
+            TotalCount = totalCount
         };
     }
 }

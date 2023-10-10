@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MiniApi.Application.Products.Request;
+using MiniApi.Common;
 
 namespace MiniApi.Application.Products;
 
@@ -21,6 +22,14 @@ internal static class CurrentPriceEndpoint
                 [FromServices] CurrentPriceService currentPriceService) => await currentPriceService.UpdateCurrentPriceAsync(request))
             .RequireAuthorization()
             .WithName("UpdateCurrentPrice")
+            .WithOpenApi();
+        
+        endpointRouteBuilder
+            .MapGet("/product-latest-prices", async (
+                [AsParameters] BasePaginationRequest queryString,
+                [FromServices] CurrentPriceService currentPriceService) => await currentPriceService.SearchProductLatestPricesAsync(queryString))
+            .RequireAuthorization()
+            .WithName("SearchProductLatestPrices")
             .WithOpenApi();
         
         return endpointRouteBuilder;
