@@ -52,3 +52,13 @@ public class CurrentPriceConfig : IEntityTypeConfiguration<CurrentPrice>
 
     }
 }
+
+public class SerialNumberCodeConfig : IEntityTypeConfiguration<SerialNumberCode>
+{
+    public void Configure(EntityTypeBuilder<SerialNumberCode> builder)
+    {
+        builder.ToTable("SerialNumberCode");
+
+        builder.HasKey(x => x.Id);
+    }
+}

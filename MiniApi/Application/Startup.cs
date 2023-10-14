@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using MiniApi.Application.Auth;
 using MiniApi.Application.Products;
+using MiniApi.Application.SerialNumberCodes;
 using MiniApi.Common;
 
 namespace MiniApi.Application;
@@ -12,7 +13,8 @@ internal static class Startup
         endpointRouteBuilder
             .MapAuthEndpoint()
             .MapProductEndpoint()
-            .MapCurrentPriceEndpoint();
+            .MapCurrentPriceEndpoint()
+            .MapSerialNumberCodeEndpoint();
         
         return endpointRouteBuilder;
     }
@@ -42,7 +44,8 @@ internal static class Startup
             .AddScoped<AuthService>()
             .AddScoped<StaffManager>()
             .AddScoped<ProductService>()
-            .AddScoped<CurrentPriceService>();
+            .AddScoped<CurrentPriceService>()
+            .AddScoped<SerialNumberCodeService>();
         
         return services;
     }
