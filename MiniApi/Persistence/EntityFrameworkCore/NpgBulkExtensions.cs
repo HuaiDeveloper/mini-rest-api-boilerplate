@@ -47,13 +47,12 @@ public static class NpgBulkExtensions
                         var npgDbType = ConvertPropertyTypeToNpgsqlDbType(modelProperty.PropertyType);
                         await binaryImport.WriteAsync(modelProperty.GetValue(model), npgDbType).ConfigureAwait(false);
                     }
-
                 }
-
                 await binaryImport.CompleteAsync().ConfigureAwait(false);
             }
 
-            var insertFromTempTableSql = $"INSERT INTO \"{tableName}\" (SELECT {columnNamesString} FROM \"{sourceTempTableName}\");";
+            var insertFromTempTableSql = $"INSERT INTO \"{tableName}\"" + 
+                                         $" (SELECT {columnNamesString} FROM \"{sourceTempTableName}\");";
             await npgConnection.ExecuteAsync(insertFromTempTableSql);
 
             var dropTempTableSql = $"DROP TABLE IF EXISTS \"{sourceTempTableName}\";";
