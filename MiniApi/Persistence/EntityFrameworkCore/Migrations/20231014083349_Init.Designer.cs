@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MiniApi.Persistence.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231010153244_Init")]
+    [Migration("20231014083349_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -70,6 +70,29 @@ namespace MiniApi.Persistence.EntityFrameworkCore.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Product", (string)null);
+                });
+
+            modelBuilder.Entity("MiniApi.Model.SerialNumberCode", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("GenerateOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NumberCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SerialNumberCode", (string)null);
                 });
 
             modelBuilder.Entity("MiniApi.Model.Staff", b =>

@@ -69,6 +69,29 @@ namespace MiniApi.Persistence.EntityFrameworkCore.Migrations
                     b.ToTable("Product", (string)null);
                 });
 
+            modelBuilder.Entity("MiniApi.Model.SerialNumberCode", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("GenerateOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NumberCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SerialNumberCode", (string)null);
+                });
+
             modelBuilder.Entity("MiniApi.Model.Staff", b =>
                 {
                     b.Property<long>("Id")

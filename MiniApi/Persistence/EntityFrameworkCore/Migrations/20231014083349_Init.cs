@@ -27,6 +27,21 @@ namespace MiniApi.Persistence.EntityFrameworkCore.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SerialNumberCode",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    NumberCode = table.Column<string>(type: "text", nullable: false),
+                    GenerateOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SerialNumberCode", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Staff",
                 columns: table => new
                 {
@@ -75,6 +90,9 @@ namespace MiniApi.Persistence.EntityFrameworkCore.Migrations
         {
             migrationBuilder.DropTable(
                 name: "CurrentPrice");
+
+            migrationBuilder.DropTable(
+                name: "SerialNumberCode");
 
             migrationBuilder.DropTable(
                 name: "Staff");
