@@ -30,33 +30,18 @@ public static class NpgBulkExtensions
             var modelProperties = typeof(TModel).GetProperties();
             var columnNamesString = string.Join(", ", modelProperties.Select(t => $"\"{t.Name}\"").ToArray());
 
-            var sourceTempTableName = $"source_temp_{tableName}";
-
-            var createTempTableSql =
-                $"CREATE TEMP TABLE IF NOT EXISTS \"{sourceTempTableName}\" AS TABLE \"{tableName}\" WITH NO DATA;";
-            await npgConnection.ExecuteAsync(createTempTableSql);
-
-            var importSql = $"COPY \"{sourceTempTableName}\" ({columnNamesString}) FROM STDIN (FORMAT BINARY)";
-            await using (var binaryImport = await npgConnection.BeginBinaryImportAsync(importSql).ConfigureAwait(false))
+            var importSql = $"COPY \"{tableName}\" ({columnNamesString}) FROM STDIN (FORMAT BINARY)";
+            await using var binaryImport = await npgConnection.BeginBinaryImportAsync(importSql).ConfigureAwait(false);
+            foreach (var model in models)
             {
-                foreach (var model in models)
+                await binaryImport.StartRowAsync().ConfigureAwait(false);
+                foreach (var modelProperty in modelProperties)
                 {
-                    await binaryImport.StartRowAsync().ConfigureAwait(false);
-                    foreach (var modelProperty in modelProperties)
-                    {
-                        var npgDbType = ConvertPropertyTypeToNpgsqlDbType(modelProperty.PropertyType);
-                        await binaryImport.WriteAsync(modelProperty.GetValue(model), npgDbType).ConfigureAwait(false);
-                    }
+                    var npgDbType = ConvertPropertyTypeToNpgsqlDbType(modelProperty.PropertyType);
+                    await binaryImport.WriteAsync(modelProperty.GetValue(model), npgDbType).ConfigureAwait(false);
                 }
-                await binaryImport.CompleteAsync().ConfigureAwait(false);
             }
-
-            var insertFromTempTableSql = $"INSERT INTO \"{tableName}\"" + 
-                                         $" (SELECT {columnNamesString} FROM \"{sourceTempTableName}\");";
-            await npgConnection.ExecuteAsync(insertFromTempTableSql);
-
-            var dropTempTableSql = $"DROP TABLE IF EXISTS \"{sourceTempTableName}\";";
-            await npgConnection.ExecuteAsync(dropTempTableSql);
+            await binaryImport.CompleteAsync().ConfigureAwait(false);
 
             return true;
         }
