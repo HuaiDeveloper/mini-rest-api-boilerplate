@@ -2,6 +2,7 @@
 using MiniApi.Application.Auth;
 using MiniApi.Application.Products;
 using MiniApi.Application.SerialNumberCodes;
+using MiniApi.Application.WebsiteFeedbacks;
 using MiniApi.Common;
 
 namespace MiniApi.Application;
@@ -14,7 +15,8 @@ internal static class Startup
             .MapAuthEndpoint()
             .MapProductEndpoint()
             .MapCurrentPriceEndpoint()
-            .MapSerialNumberCodeEndpoint();
+            .MapSerialNumberCodeEndpoint()
+            .MapWebsiteFeedbackEndpoint();
         
         return endpointRouteBuilder;
     }
@@ -45,7 +47,8 @@ internal static class Startup
             .AddScoped<StaffManager>()
             .AddScoped<ProductService>()
             .AddScoped<CurrentPriceService>()
-            .AddScoped<SerialNumberCodeService>();
+            .AddScoped<SerialNumberCodeService>()
+            .AddScoped<WebsiteFeedbackService>();
         
         return services;
     }
