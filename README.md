@@ -23,7 +23,7 @@
 - [x] 透過 Dapper 操作資料庫
 - [x] PostgreSQL BulkInsert / BulkUpsert 範例
 - [ ] BackgroundService 背景工作範例
-- [ ] MongoDB
+- [x] MongoDB
 - [ ] Unit Test
 
 ## Memo
