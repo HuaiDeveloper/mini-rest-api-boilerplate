@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using MiniApi.Application;
+using MiniApi.BackgroundJob;
 using MiniApi.Middleware;
 using MiniApi.Persistence;
 using Serilog;
@@ -30,6 +31,7 @@ try
     builder.Services.AddPersistence();
     builder.Services.AddMiddleware();
     builder.Services.AddApplication();
+    builder.Services.AddBackgroundJob(builder.Configuration);
 
     var app = builder.Build();
 
