@@ -22,7 +22,7 @@
 - [x] 透過 Serilog 收集 Log
 - [x] 透過 Dapper 操作資料庫
 - [x] PostgreSQL BulkInsert / BulkUpsert 範例
-- [ ] BackgroundService 背景工作範例
+- [x] BackgroundService 背景工作範例
 - [x] MongoDB
 - [ ] Unit Test
 
