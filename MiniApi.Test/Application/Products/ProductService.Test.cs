@@ -10,39 +10,44 @@ namespace MiniApi.Test.Application.Products;
 [TestClass]
 public class ProductService_Test
 {
-    [TestMethod]
-    public async Task Get_SingleProduct_ReturnSameProduct()
+    private static DbContextOptions<ApplicationDbContext> _mockContextOptions;
+    
+    [ClassInitialize]
+    public static void Init(TestContext testcontext)
     {
-        var connection = new SqliteConnection("Filename=:memory:");
-        connection.Open();
-        
-        var contextOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseSqlite(connection)
+        _mockContextOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseSqlite(MockDataUtility.SQLiteConnectionString)
             .Options;
-        await using var context = new ApplicationDbContext(contextOptions);
-        
-        if (context.Database.EnsureCreated())
-        {
-            using var viewCommand = context.Database.GetDbConnection().CreateCommand();
-            viewCommand.CommandText = @"
-                CREATE VIEW AllResources AS
-                SELECT Url
-                FROM Product;";
-            viewCommand.ExecuteNonQuery();
-        }
-        
-        var mockProduct = new Product("TestName", "TestDesc");
-        
-        await context.AddAsync(mockProduct);
-        await context.SaveChangesAsync();
-        
+    }
+    
+    [ClassCleanup]
+    public static async Task Cleanup()
+    {
+        var mockDataContext = new ApplicationDbContext(_mockContextOptions);
 
-        var productService = new ProductService(context);
+        await mockDataContext.Products.ExecuteDeleteAsync();
+    }
+    
+    [TestMethod]
+    public async Task GetProductAsync_ReturnSingleProduct()
+    {
+        
+        var mockProduct = new Product("Apple", "Test apple desc");
+        
+        await using (var mockDataContext = new ApplicationDbContext(_mockContextOptions))
+        {
+            await mockDataContext.AddAsync(mockProduct);
+            await mockDataContext.SaveChangesAsync();
+        }
+
+        await using var dbContext = new ApplicationDbContext(_mockContextOptions);
+
+        var productService = new ProductService(dbContext);
         var product = await productService.GetProductAsync(mockProduct.Id);
         
         Assert.AreEqual(mockProduct.Id, product.Id);
         Assert.AreEqual(mockProduct.Name, product.Name);
         Assert.AreEqual(mockProduct.Description, product.Description);
-        Assert.AreEqual(0, product.CurrentPrices?.Count());
+        Assert.AreEqual(0, product.CurrentPrices?.Count);
     }
 }
