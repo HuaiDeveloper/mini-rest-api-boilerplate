@@ -24,7 +24,7 @@
 - [x] PostgreSQL BulkInsert / BulkUpsert 範例
 - [x] BackgroundService 背景工作範例
 - [x] MongoDB
-- [ ] Unit Test
+- [x] Unit Test
 
 ## Memo
 
