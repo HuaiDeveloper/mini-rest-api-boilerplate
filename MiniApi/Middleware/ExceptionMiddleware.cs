@@ -34,6 +34,7 @@ public class ExceptionMiddleware : IMiddleware
                     break;
 
                 default:
+                    errorResponse.Message = "Internal server error";
                     context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                     break;
             }
