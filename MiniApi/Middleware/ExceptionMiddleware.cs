@@ -6,8 +6,10 @@ namespace MiniApi.Middleware;
 
 public class ExceptionMiddleware : IMiddleware
 {
-    public ExceptionMiddleware()
+    private readonly ILogger<ExceptionMiddleware> _logger;
+    public ExceptionMiddleware(ILogger<ExceptionMiddleware> logger)
     {
+        _logger = logger;
     }
     
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -40,6 +42,8 @@ public class ExceptionMiddleware : IMiddleware
             }
             
             await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
+            
+            _logger.LogError(ex, ex.Message);
         }
     }
 }
