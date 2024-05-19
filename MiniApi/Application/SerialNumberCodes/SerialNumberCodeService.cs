@@ -9,23 +9,15 @@ using MiniApi.Persistence.EntityFrameworkCore;
 
 namespace MiniApi.Application.SerialNumberCodes;
 
-public class SerialNumberCodeService
+public class SerialNumberCodeService(ApplicationDbContext dbContext, ILogger<SerialNumberCodeService> logger)
 {
-    private readonly ApplicationDbContext _dbContext;
-    private ILogger<SerialNumberCodeService> _logger;
-    public SerialNumberCodeService(ApplicationDbContext dbContext, ILogger<SerialNumberCodeService> logger)
-    {
-        _dbContext = dbContext;
-        _logger = logger;
-    }
-
     public async Task<string> GenerateSerialNumberCodeAsync(GenerateSerialNumberCodeRequest request)
     {
         var isValidate = CustomValidator.TryValidateObject(request, out var validationResults);
         if (isValidate == false)
             throw new BadRequestException(validationResults);
 
-        if (await _dbContext.SerialNumberCodes.AnyAsync())
+        if (await dbContext.SerialNumberCodes.AnyAsync())
             throw new BaseException("Serial number code already generated");
         
         var serialNumberCodes = new List<SerialNumberCode>();
@@ -33,7 +25,7 @@ public class SerialNumberCodeService
             serialNumberCodes.Add(new SerialNumberCode(index, $"code{index}", null));
         
         var tableName = nameof(SerialNumberCode);
-        var result = await _dbContext.NpgBulkInsertAsync(tableName, serialNumberCodes, _logger);
+        var result = await dbContext.NpgBulkInsertAsync(tableName, serialNumberCodes, logger);
 
         if (result == false)
             throw new BaseException("Generate Fail");
@@ -56,7 +48,7 @@ public class SerialNumberCodeService
         {
             nameof(SerialNumberCode.Id)
         };
-        var result = await _dbContext.NpgBulkUpsertAsync(tableName, serialNumberCodes, conflictColumnName, _logger);
+        var result = await dbContext.NpgBulkUpsertAsync(tableName, serialNumberCodes, conflictColumnName, logger);
 
         if (result == false)
             throw new BaseException("Regenerate Fail");
@@ -70,7 +62,7 @@ public class SerialNumberCodeService
         if (isValidate == false)
             throw new BadRequestException(validationResults);
         
-        var serialNumberCodeQuery = _dbContext.SerialNumberCodes.AsNoTracking();
+        var serialNumberCodeQuery = dbContext.SerialNumberCodes.AsNoTracking();
             
         var serialNumberCodes = await serialNumberCodeQuery
             .OrderByDescending(x => x.Id)
@@ -96,7 +88,7 @@ public class SerialNumberCodeService
     public async Task<string> ClearSerialNumberCodesAsync()
     {
         var clearSerialNumberCodesSql = $"DELETE FROM public.\"SerialNumberCode\" WHERE 1 = 1;";
-        await _dbContext.DbConnection.ExecuteAsync(clearSerialNumberCodesSql);
+        await dbContext.DbConnection.ExecuteAsync(clearSerialNumberCodesSql);
 
         return "Successfully clear";
     }

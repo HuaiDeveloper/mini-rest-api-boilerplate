@@ -10,17 +10,11 @@ using MiniApi.Persistence.EntityFrameworkCore;
 
 namespace MiniApi.Application.Products;
 
-public class ProductService
+public class ProductService(ApplicationDbContext dbContext)
 {
-    private readonly ApplicationDbContext _dbContext;
-    public ProductService(ApplicationDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
     public async Task<ProductDetailDto> GetProductAsync(long id)
     {
-        var product = await _dbContext.Products.AsNoTracking()
+        var product = await dbContext.Products.AsNoTracking()
             .Include(x => x.CurrentPrices)
             .Where(x => x.Id == id)
             .Select(x => new
@@ -61,7 +55,7 @@ public class ProductService
         if (isValidate == false)
             throw new BadRequestException(validationResults);
         
-        var productQuery = _dbContext.Products.AsNoTracking();
+        var productQuery = dbContext.Products.AsNoTracking();
             
         var products = await productQuery
             .OrderByDescending(x => x.Id)
@@ -91,8 +85,8 @@ public class ProductService
 
         var product = new Product(request.Name, request.Description);
 
-        _dbContext.Products.Add(product);
-        await _dbContext.SaveChangesAsync();
+        dbContext.Products.Add(product);
+        await dbContext.SaveChangesAsync();
 
         return new ProductDetailDto()
         {
@@ -108,7 +102,7 @@ public class ProductService
         if (isValidate == false)
             throw new BadRequestException(validationResults);
         
-        var product = await _dbContext.Products
+        var product = await dbContext.Products
             .Include(x => x.CurrentPrices)
             .Where(x => x.Id == request.Id)
             .FirstOrDefaultAsync();
@@ -116,7 +110,7 @@ public class ProductService
             throw new NotFoundException($"Not found id: {request.Id}");
 
         product.Update(request.Name, request.Description);
-        await _dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         return new ProductDetailDto()
         {
@@ -138,15 +132,15 @@ public class ProductService
 
     public async Task<string> DeleteProductAsync(long id)
     {
-        var product = await _dbContext.Products
+        var product = await dbContext.Products
             .Include(x => x.CurrentPrices)
             .Where(x => x.Id == id)
             .FirstOrDefaultAsync();
         if (product == null)
             throw new NotFoundException($"Not found id: {id}");
 
-        _dbContext.Products.Remove(product);
-        await _dbContext.SaveChangesAsync();
+        dbContext.Products.Remove(product);
+        await dbContext.SaveChangesAsync();
 
         return "Successfully deleted";
     }

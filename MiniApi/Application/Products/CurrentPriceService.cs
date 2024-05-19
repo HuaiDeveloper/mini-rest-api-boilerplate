@@ -10,21 +10,15 @@ using MiniApi.Persistence.EntityFrameworkCore;
 
 namespace MiniApi.Application.Products;
 
-public class CurrentPriceService
+public class CurrentPriceService(ApplicationDbContext dbContext)
 {
-    private readonly ApplicationDbContext _dbContext;
-    public CurrentPriceService(ApplicationDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-    
     public async Task<CurrentPriceDetailDto> CreateCurrentPriceAsync(CreateCurrentPriceRequest request)
     {
         var isValidate = CustomValidator.TryValidateObject(request, out var validationResults);
         if (isValidate == false)
             throw new BadRequestException(validationResults);
         
-        var product = await _dbContext.Products.AsNoTracking()
+        var product = await dbContext.Products.AsNoTracking()
             .Where(x => x.Id == request.ProductId)
             .FirstOrDefaultAsync();
         if (product == null)
@@ -36,8 +30,8 @@ public class CurrentPriceService
             request.CurrentDate,
             request.Description);
 
-        _dbContext.CurrentPrices.Add(currentPrice);
-        await _dbContext.SaveChangesAsync();
+        dbContext.CurrentPrices.Add(currentPrice);
+        await dbContext.SaveChangesAsync();
 
         return new CurrentPriceDetailDto()
         {
@@ -55,7 +49,7 @@ public class CurrentPriceService
         if (isValidate == false)
             throw new BadRequestException(validationResults);
         
-        var currentPrice = await _dbContext.CurrentPrices
+        var currentPrice = await dbContext.CurrentPrices
             .Where(x => x.Id == request.Id)
             .FirstOrDefaultAsync();
         if (currentPrice == null)
@@ -65,7 +59,7 @@ public class CurrentPriceService
             request.Price,
             request.CurrentDate,
             request.Description);
-        await _dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         return new CurrentPriceDetailDto()
         {
@@ -120,11 +114,11 @@ public class CurrentPriceService
         parameter.Add("skip", (request.Page - 1) * request.Size, DbType.Int32);
         parameter.Add("take", request.Size, DbType.Int32);
 
-        var productLatestPrices = await _dbContext.DbConnection
+        var productLatestPrices = await dbContext.DbConnection
             .QueryAsync<ProductLatestPriceDto>(sql, parameter);
 
         var countSql = "SELECT COUNT(1) FROM public.\"Product\" WHERE 1 = 1;";
-        var totalCount = await _dbContext.DbConnection.QueryFirstAsync<int>(countSql);
+        var totalCount = await dbContext.DbConnection.QueryFirstAsync<int>(countSql);
 
         return new BasePaginationResponse<List<ProductLatestPriceDto>>()
         {

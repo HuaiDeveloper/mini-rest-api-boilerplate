@@ -2,7 +2,7 @@
 
 namespace MiniApi.Common;
 
-public class CustomValidator
+public static class CustomValidator
 {
     public static bool TryValidateObject<T>(T instance, out ICollection<ValidationResult> validationResults)
     {

@@ -7,14 +7,8 @@ using MiniApi.Persistence.EntityFrameworkCore;
 
 namespace MiniApi.Application.Auth;
 
-public class StaffManager
+public class StaffManager(ApplicationDbContext dbContext)
 {
-    private readonly ApplicationDbContext _dbContext;
-    public StaffManager(ApplicationDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
     public async Task<Staff> CreateUserStaffAsync(
         string name,
         string email,
@@ -39,16 +33,16 @@ public class StaffManager
 
         staff.UpdatePassword(HashPassword(staff, password));
         
-        _dbContext.Staffs.Add(staff);
+        dbContext.Staffs.Add(staff);
 
-        await _dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         return staff;
     }
     
     public async Task<Staff> FindStaffAsync(long id)
     {
-        var staff = await _dbContext.Staffs.AsNoTracking()
+        var staff = await dbContext.Staffs.AsNoTracking()
             .Where(x => x.Id == id)
             .FirstOrDefaultAsync();
 
@@ -63,7 +57,7 @@ public class StaffManager
     
     public async Task<Staff> FindStaffAsync(string name)
     {
-        var staff = await _dbContext.Staffs.AsNoTracking()
+        var staff = await dbContext.Staffs.AsNoTracking()
             .Where(x => x.Name == name)
             .FirstOrDefaultAsync();
 
@@ -78,7 +72,7 @@ public class StaffManager
     
     public async Task<bool> IsExistStaffNameAsync(string name)
     {
-        return await _dbContext.Staffs.AnyAsync(x => x.Name == name);
+        return await dbContext.Staffs.AnyAsync(x => x.Name == name);
     }
     
     public async Task<bool> VerifyPasswordAsync(Staff staff, string password)
@@ -93,7 +87,7 @@ public class StaffManager
 
         if (verifyHashedPasswordResult == PasswordVerificationResult.SuccessRehashNeeded)
         {
-            var staffContext = await _dbContext.Staffs
+            var staffContext = await dbContext.Staffs
                 .Where(x => x.Id == staff.Id)
                 .FirstOrDefaultAsync();
 
@@ -102,7 +96,7 @@ public class StaffManager
 
             staffContext.UpdatePassword(staffPasswordHasher.HashPassword(staffContext, password));
 
-            await _dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
         }
 
         return true;
@@ -110,7 +104,7 @@ public class StaffManager
     
     public async Task<(List<Staff> Data, int TotalCount)> SearchUserStaffs(int page, int size)
     {
-        var staffQuery = _dbContext.Staffs.AsNoTracking()
+        var staffQuery = dbContext.Staffs.AsNoTracking()
             .Where(x => x.AuthRole == AuthRole.User);
 
         var staffs = await staffQuery

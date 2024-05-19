@@ -4,14 +4,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace MiniApi.Application.Auth;
 
-public class CustomCookieAuthenticationEvents :  CookieAuthenticationEvents
+public class CustomCookieAuthenticationEvents(StaffManager staffManager) : CookieAuthenticationEvents
 {
-    private readonly StaffManager _staffManager;
-    public CustomCookieAuthenticationEvents(StaffManager staffManager)
-    {
-        _staffManager = staffManager;
-    }
-
     public override async Task ValidatePrincipal(CookieValidatePrincipalContext context)
     {
         var claimsPrincipal = context.Principal;
@@ -40,7 +34,7 @@ public class CustomCookieAuthenticationEvents :  CookieAuthenticationEvents
             return;
         }
             
-        var staff = await _staffManager.FindStaffAsync(staffId);
+        var staff = await staffManager.FindStaffAsync(staffId);
         if (staff.Name != staffNameString
             || staff.AuthRole != staffRoleString)
             await Reject(context);

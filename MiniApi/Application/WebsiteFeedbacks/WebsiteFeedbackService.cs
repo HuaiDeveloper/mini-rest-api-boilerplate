@@ -11,14 +11,8 @@ using MongoDB.Driver;
 
 namespace MiniApi.Application.WebsiteFeedbacks;
 
-public class WebsiteFeedbackService
+public class WebsiteFeedbackService(MongoDBContext mongoDBContext)
 {
-    private readonly MongoDBContext _mongoDBContext;
-    public WebsiteFeedbackService(MongoDBContext mongoDBContext)
-    {
-        _mongoDBContext = mongoDBContext;
-    }
-
     public Dictionary<string, int> GetWebsiteFeedbackTypes()
     {
         return Enum.GetValues(typeof(WebsiteFeedbackTypeEnum))
@@ -32,7 +26,7 @@ public class WebsiteFeedbackService
         if (isValidate == false)
             throw new BadRequestException(validationResults);
         
-        var websiteFeedbackQuery = _mongoDBContext.Feedbacks.AsQueryable();
+        var websiteFeedbackQuery = mongoDBContext.Feedbacks.AsQueryable();
             
         var websiteFeedbacks = websiteFeedbackQuery
             .OrderByDescending(x => x.Id)
@@ -70,7 +64,7 @@ public class WebsiteFeedbackService
         
         var websiteFeedback = new Feedback(request.Type, request.Content, receiveOn);
         
-        await _mongoDBContext.Feedbacks.InsertOneAsync(websiteFeedback);
+        await mongoDBContext.Feedbacks.InsertOneAsync(websiteFeedback);
 
         return "Success feedback";
     }
@@ -83,7 +77,7 @@ public class WebsiteFeedbackService
         
         var filter = Builders<Feedback>.Filter.Where(f => f.Id == requestObjectId);
         
-        await _mongoDBContext.Feedbacks.DeleteOneAsync(filter);
+        await mongoDBContext.Feedbacks.DeleteOneAsync(filter);
 
         return "Successfully deleted";
     }

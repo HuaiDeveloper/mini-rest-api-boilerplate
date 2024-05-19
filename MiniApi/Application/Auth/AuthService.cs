@@ -8,29 +8,21 @@ using MiniApi.Common.Exceptions;
 
 namespace MiniApi.Application.Auth;
 
-public class AuthService
+public class AuthService(
+    IHttpContextAccessor httpContextAccessor,
+    StaffManager staffManager)
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly StaffManager _staffManager;
-    public AuthService(
-        IHttpContextAccessor httpContextAccessor,
-        StaffManager staffManager)
-    {
-        _httpContextAccessor = httpContextAccessor;
-        _staffManager = staffManager;
-    }
-
     public async Task<string> SignUp(SignUpRequest request)
     {
         var isValidate = CustomValidator.TryValidateObject(request, out var validationResults);
         if (isValidate == false)
             throw new BadRequestException(validationResults);
 
-        var isExistStaff = await _staffManager.IsExistStaffNameAsync(request.Name);
+        var isExistStaff = await staffManager.IsExistStaffNameAsync(request.Name);
         if (isExistStaff)
             throw new BadRequestException("User name exist!");
                     
-        await _staffManager.CreateUserStaffAsync(
+        await staffManager.CreateUserStaffAsync(
             request.Name,
             request.Email,
             request.Password,
@@ -45,8 +37,8 @@ public class AuthService
         if (isValidate == false)
             throw new BadRequestException(validationResults);
 
-        var staff = await _staffManager.FindStaffAsync(request.Name);
-        var verifyPasswordResult = await _staffManager.VerifyPasswordAsync(staff, request.Password);
+        var staff = await staffManager.FindStaffAsync(request.Name);
+        var verifyPasswordResult = await staffManager.VerifyPasswordAsync(staff, request.Password);
         if (verifyPasswordResult == false)
             throw new NotFoundException("Verification failed");
             
@@ -71,7 +63,7 @@ public class AuthService
             ExpiresUtc = expiresUtc
         };
 
-        var httpContext = _httpContextAccessor.HttpContext;
+        var httpContext = httpContextAccessor.HttpContext;
         if (httpContext == null)
             throw new BaseException("httpContext is null");
             
@@ -84,7 +76,7 @@ public class AuthService
 
     public async Task<string> SignOut()
     {
-        var httpContext = _httpContextAccessor.HttpContext;
+        var httpContext = httpContextAccessor.HttpContext;
         if (httpContext == null)
             throw new BaseException("httpContext is null");
             
@@ -99,7 +91,7 @@ public class AuthService
         if (isValidate == false)
             throw new BadRequestException(validationResults);
         
-        var searchUserStaffsResult = await _staffManager.SearchUserStaffs(
+        var searchUserStaffsResult = await staffManager.SearchUserStaffs(
             request.Page, request.Size);
 
         var data = searchUserStaffsResult.Data

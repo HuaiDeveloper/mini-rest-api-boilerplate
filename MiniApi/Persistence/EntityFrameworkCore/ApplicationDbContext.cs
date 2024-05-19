@@ -4,13 +4,8 @@ using MiniApi.Model;
 
 namespace MiniApi.Persistence.EntityFrameworkCore;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
 {
-    public ApplicationDbContext(DbContextOptions options)
-        : base(options)
-    {
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
